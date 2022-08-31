@@ -1,0 +1,36 @@
+*This time we are executing a program containing ‘N’ functions on a single-threaded CPU. Each function has a unique ‘ID’ between 0 and (N-1) and each time it starts or ends, we write a log with the ID, whether it started or ended, and the TIMESTAMP.*
+
+#include<bits/stdc++.h>
+vector<int> exclusiveTime(vector<vector<int>> &logs, int n, int l) 
+{
+    // Write your code here.
+    //stack of {{id,status},timestamp}
+    stack<pair<pair<int,int>,int>> s;
+    vector<int> ans(n,0);
+    for(int i=0;i<l;i++){
+        int id=logs[0][i];
+        int status=logs[1][i];
+        int timestamp=logs[2][i];
+
+        pair<pair<int,int>,int> func={{id,status},timestamp};
+        if(status==1) //status 1 so function starts performing
+            s.push(func);
+        else {  //status -1 means a function is ending
+            int currtime = timestamp - s.top().second + 1; //calculate the time
+            ans[id] += currtime; //ans id mein add the time.
+
+            s.pop();
+            // if after popping stack is not empty that means , the top of stack is parent of current function.
+            //and we shld subtract the time of current from parent function.
+            if(!s.empty()){
+                int justbeforeid=s.top().first.first;
+                ans[justbeforeid] -= currtime; //subtract from parent function.
+            }
+
+        }
+
+    }
+
+    return ans;
+
+}
